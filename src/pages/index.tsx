@@ -30,9 +30,9 @@ const Home: NextPage = () => {
       console.log('frontend not connected to SNS contract')
     }
     else {
-      var data_dec = data['nameRequired'].split ('').map (function (c : string) { return c.charCodeAt (0); }).join('')
+      let data_dec = string_to_felt (data['nameRequired']).toString()
       invokeSnsRegister ({ args: { name: data_dec } })
-      console.log('invoke sns_register() with ', data_dec)
+      console.log('invoked sns_register() with ', data_dec)
     }
   }
 
@@ -100,6 +100,15 @@ function TransactionItem({
       {transaction.status}: {transaction.transactionHash} <button onClick={onClick}>remove</button>
     </div>
   )
+}
+
+function string_to_felt(str : string){
+  let array = str.split ('').map (function (c : string) { return c.charCodeAt (0); })
+  let felt = 0
+  for (const e of array) {
+    felt = felt*256 + e
+  }
+  return felt
 }
 
 export default Home
