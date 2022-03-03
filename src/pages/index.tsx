@@ -5,6 +5,7 @@ import {
   useStarknetTransactionManager,
   Transaction
 } from '@starknet-react/core'
+import { BigNumber } from 'bignumber.js'
 import type { NextPage } from 'next'
 import { ConnectWallet } from '~/components/ConnectWallet'
 import { useSNSContract } from '~/hooks/sns'
@@ -30,9 +31,9 @@ const Home: NextPage = () => {
       console.log('frontend not connected to SNS contract')
     }
     else {
-      let data_dec = string_to_felt (data['nameRequired']).toString()
-      invokeSnsRegister ({ args: { name: data_dec } })
-      console.log('invoked sns_register() with ', data_dec)
+      let data_dec_str = string_to_felt_bn (data['nameRequired']).toString()
+      invokeSnsRegister ({ args: { name: data_dec_str } })
+      console.log('invoked sns_register() with ', data_dec_str)
     }
   }
 
@@ -102,13 +103,17 @@ function TransactionItem({
   )
 }
 
-function string_to_felt(str : string){
+function string_to_felt_bn (str : string){
+  BigNumber.config({ EXPONENTIAL_AT: 76 })
+
   let array = str.split ('').map (function (c : string) { return c.charCodeAt (0); })
-  let felt = 0
+  let felt_bn = new BigNumber (0)
+
   for (const e of array) {
-    felt = felt*256 + e
+    felt_bn = felt_bn.multipliedBy(256)
+    felt_bn = felt_bn.plus(e)
   }
-  return felt
+  return felt_bn
 }
 
 export default Home
